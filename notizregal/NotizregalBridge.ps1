@@ -200,6 +200,28 @@ function Invoke-Transcribe($req) {
     }
 }
 
+# --- Nextcloud-WebDAV-Befehle ----------------------------------------------
+function Invoke-NextcloudUploadCmd($req) {
+    $r = Invoke-NextcloudUpload ([string]$req['path']) ([string]$req['remote'])
+    Write-Result ([ordered]@{ ok = $true; remote = [string]$r.remote; bytes = [long]$r.bytes })
+}
+function Invoke-NextcloudDownloadCmd($req) {
+    $r = Invoke-NextcloudDownload ([string]$req['remote']) ([string]$req['dest'])
+    Write-Result ([ordered]@{ ok = $true; dest = [string]$r.dest; bytes = [long]$r.bytes })
+}
+function Invoke-NextcloudListCmd($req) {
+    $items = @(Invoke-NextcloudList)
+    $out = @()
+    foreach ($it in $items) {
+        $out += [ordered]@{ name = [string]$it.name; size = [long]$it.size; modified = [string]$it.modified }
+    }
+    Write-Result ([ordered]@{ ok = $true; items = $out })
+}
+function Invoke-NextcloudTestCmd($req) {
+    $null = Test-Nextcloud
+    Write-Result ([ordered]@{ ok = $true })
+}
+
 try {
     $req = Read-Request $OutBase
     # Benoetigte Werkzeug-Bibliotheken auf Skriptebene dot-sourcen (damit ihre
@@ -207,15 +229,20 @@ try {
     switch -Regex ($Command) {
         '-version$|^list-versions$' { . (Join-Path $PSScriptRoot 'app\VersionTools.ps1') }
         '^extract-text$'            { . (Join-Path $PSScriptRoot 'app\TextTools.ps1') }
+        '^nextcloud-'               { . (Join-Path $PSScriptRoot 'app\NextcloudTools.ps1') }
     }
     switch ($Command) {
-        'find-stickers'   { Invoke-FindStickers   $req }
-        'save-version'    { Invoke-SaveVersion     $req }
-        'list-versions'   { Invoke-ListVersions    $req }
-        'restore-version' { Invoke-RestoreVersion  $req }
-        'export-version'  { Invoke-ExportVersion   $req }
-        'extract-text'    { Invoke-ExtractText     $req }
-        'transcribe'      { Invoke-Transcribe      $req }
+        'find-stickers'      { Invoke-FindStickers   $req }
+        'save-version'       { Invoke-SaveVersion     $req }
+        'list-versions'      { Invoke-ListVersions    $req }
+        'restore-version'    { Invoke-RestoreVersion  $req }
+        'export-version'     { Invoke-ExportVersion   $req }
+        'extract-text'       { Invoke-ExtractText     $req }
+        'transcribe'         { Invoke-Transcribe      $req }
+        'nextcloud-upload'   { Invoke-NextcloudUploadCmd   $req }
+        'nextcloud-download' { Invoke-NextcloudDownloadCmd $req }
+        'nextcloud-list'     { Invoke-NextcloudListCmd     $req }
+        'nextcloud-test'     { Invoke-NextcloudTestCmd     $req }
         default { throw ('Unbekannter Befehl: ' + $Command) }
     }
     exit 0

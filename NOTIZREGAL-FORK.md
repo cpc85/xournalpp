@@ -20,6 +20,7 @@ Funktionen sind einzeln zu- und abschaltbar.
 | `NotizregalTextexport` | Text erkennen / exportieren | Getippten Text (und experimentell Windows-Ink-Handschrift) extrahieren, einfügen oder als Markdown/TXT speichern. |
 | `NotizregalAudio` | Audio transkribieren | OGG/WAV-Aufnahmen offline mit dem enthaltenen Whisper-Modell in Text umwandeln, einfügen oder speichern. |
 | `NotizregalSticker` | Stickerpalette | OpenMoji-Sticker einfügen – zum markierten Wort direkt in die Notiz, oder über das volle Palettenfenster (Suche/Favoriten). |
+| `NotizregalNextcloud` | Nextcloud-Sync | Aktuelles Notizbuch per WebDAV in eine Nextcloud hochladen und Dateien zurückholen; Zugang per WPF-Dialog, App-Passwort lokal per DPAPI verschlüsselt. |
 
 Alle Plugins stehen in `plugins/` und sind mit `enabled=false` vorkonfiguriert –
 sie erscheinen erst nach dem Aktivieren in **Einstellungen → Plugins**.
@@ -56,7 +57,20 @@ Vollständig dateibasiert, ohne Zusatzbibliotheken:
   `notizregal/lua/notizregal.lua`.
 
 Bridge-Befehle: `save-version`, `list-versions`, `restore-version`,
-`export-version`, `extract-text`, `transcribe`, `find-stickers`.
+`export-version`, `extract-text`, `transcribe`, `find-stickers`,
+`nextcloud-upload`, `nextcloud-download`, `nextcloud-list`, `nextcloud-test`.
+
+### Nextcloud-WebDAV-Sync
+
+`NotizregalNextcloud` lädt das aktuell geöffnete `.xopp` per WebDAV hoch
+(`PUT` auf `<server>/remote.php/dav/files/<benutzer>/<ordner>/…`), listet den
+Zielordner (`PROPFIND`) und lädt Dateien zurück (`GET`, `.xopp` optional direkt
+öffnen). Zugangsdaten werden über das WPF-Fenster `NextcloudConfig.ps1`
+eingegeben und in `%LOCALAPPDATA%\Notizregal\nextcloud.json` gespeichert; das
+**App-Passwort ist per Windows-DPAPI** (an den Windows-Benutzer gebunden)
+verschlüsselt und verlässt das Gerät nicht. Empfohlen: HTTPS und ein
+Nextcloud-App-Passwort (Einstellungen → Sicherheit). Der WebDAV-Client wurde
+gegen einen lokalen Test-Server geprüft (Upload/Liste/Download, Basic-Auth).
 
 ## Voraussetzungen und Grenzen
 
