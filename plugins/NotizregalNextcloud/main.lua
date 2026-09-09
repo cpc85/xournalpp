@@ -29,10 +29,10 @@ local N = loadNotizregal()
 local pending = {}
 
 function initUi()
-    app.registerUi({ menu = "Nextcloud einrichten …", callback = "NzNcConfig", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Verbindung testen", callback = "NzNcTest", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Aktuelles Notizbuch hochladen", callback = "NzNcUpload", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Aus Nextcloud herunterladen …", callback = "NzNcDownloadList", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Nextcloud einrichten …", callback = "NzNcConfig" })
+    app.registerUi({ menu = "Verbindung testen", callback = "NzNcTest" })
+    app.registerUi({ menu = "Aktuelles Notizbuch hochladen", callback = "NzNcUpload" })
+    app.registerUi({ menu = "Aus Nextcloud herunterladen …", callback = "NzNcDownloadList" })
 end
 
 local function ready()

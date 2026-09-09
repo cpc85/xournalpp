@@ -29,8 +29,8 @@ local N = loadNotizregal()
 local pending = {}
 
 function initUi()
-    app.registerUi({ menu = "Version jetzt sichern", callback = "NzVersionSave", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Versionen anzeigen / wiederherstellen …", callback = "NzVersionList", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Version jetzt sichern", callback = "NzVersionSave" })
+    app.registerUi({ menu = "Versionen anzeigen / wiederherstellen …", callback = "NzVersionList" })
 end
 
 local function ready()

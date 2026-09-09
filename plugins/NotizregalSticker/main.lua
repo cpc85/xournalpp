@@ -31,8 +31,8 @@ local N = loadNotizregal()
 local pending = {}
 
 function initUi()
-    app.registerUi({ menu = "Sticker zum markierten Wort einfuegen", callback = "NzStickerForSelection", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Stickerpalette oeffnen (Suche, Favoriten)", callback = "NzStickerPalette", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Sticker zum markierten Wort einfuegen", callback = "NzStickerForSelection" })
+    app.registerUi({ menu = "Stickerpalette oeffnen (Suche, Favoriten)", callback = "NzStickerPalette" })
 end
 
 local function ready()

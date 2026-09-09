@@ -29,7 +29,7 @@ local N = loadNotizregal()
 local pending = {}
 
 function initUi()
-    app.registerUi({ menu = "Audioaufnahme transkribieren …", callback = "NzAudioPick", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Audioaufnahme transkribieren …", callback = "NzAudioPick" })
 end
 
 local function ready()

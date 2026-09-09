@@ -28,10 +28,10 @@ local N = loadNotizregal()
 local pending = {}
 
 function initUi()
-    app.registerUi({ menu = "Notiztext als Markdown exportieren", callback = "NzTextExportMd", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Notiztext als TXT exportieren", callback = "NzTextExportTxt", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Text + Handschrift exportieren (experimentell)", callback = "NzTextExportInk", parentPath = "Notizregal" })
-    app.registerUi({ menu = "Erkannten Text als Textfeld einfuegen", callback = "NzTextInsert", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Notiztext als Markdown exportieren", callback = "NzTextExportMd" })
+    app.registerUi({ menu = "Notiztext als TXT exportieren", callback = "NzTextExportTxt" })
+    app.registerUi({ menu = "Text + Handschrift exportieren (experimentell)", callback = "NzTextExportInk" })
+    app.registerUi({ menu = "Erkannten Text als Textfeld einfuegen", callback = "NzTextInsert" })
 end
 
 local function ready()

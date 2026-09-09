@@ -28,7 +28,7 @@ end
 local N = loadNotizregal()
 
 function initUi()
-    app.registerUi({ menu = "Notizbuchregal oeffnen", callback = "NzRegalOpen", parentPath = "Notizregal" })
+    app.registerUi({ menu = "Notizbuchregal oeffnen", callback = "NzRegalOpen" })
 end
 
 function NzRegalOpen()
