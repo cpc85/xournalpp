@@ -1,0 +1,6 @@
+OpenMoji 17.0.0 – https://github.com/hfg-gmuend/openmoji
+Grafiken: CC BY-SA 4.0. Urheber: OpenMoji / HfG Schwäbisch Gmünd und Mitwirkende.
+Originale SVG-Dateien für dieses Paket in PNG 618x618 gerastert; Motive unverändert.
+Deutsche Bezeichnungen und Suchwörter: Unicode CLDR 48.2.0, Unicode-Lizenz (siehe LICENSE-Unicode.txt).
+https://github.com/unicode-org/cldr-json
+Fallback bei fehlender deutscher Bezeichnung: originaler englischer OpenMoji-Name.

@@ -1,0 +1,17 @@
+{
+  "model-source.json": "7e303821f0d13c3ba9a5a145f0449c8a3f423d30d722a86a0a7775cad7388d63",
+  "audio-convert.exe": "54e3ba7433d16a72093cb1094502a8193360d3aee7438dfa49b816d35374a9cf",
+  "ggml-base-q5_1.bin": "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898",
+  "bundle.version": "4cecdac82b9ab78fcbcece4ec2511499d37a144a75e15e6cea1a144e0342d80b",
+  "whisper-cli.exe": "b4ba3cf400592f66a5117cfd86ff2334c912bc7429576771d048331bebb57a28",
+  "BUILD.md": "d4a38605a41bf9471b96bbcc9cf45a6fc4f6aa90f70f4a0d68738684dd54f795",
+  "LICENSE-runtime.txt": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+  "LICENSE-whisper-ggml.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+  "LICENSE-model.txt": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+  "source/libcxx.patch": "33122bee1baa29ed8ba86f57e1cb1acb8c883cafe3f258b2c6ca4f663d6ecb4c",
+  "source/stb_vorbis.c": "4c7cb2ff1f7011e9d67950446b7eb9ca044f2e464d76bfbb0b84dd2e23e65636",
+  "source/audio-convert.c": "6e13cfdbfd1ccc360572afd3719b72e525f60ad75148d5b02fc74b282478b734",
+  "source/LICENSE-Notizregal.txt": "69427934d3f99d9ed52153e68b27b23e41c38bc3b7d3a3eb57809b8f4c128ca0",
+  "source/whisper.cpp-v1.8.5.tar.gz": "cd702189cb5e608c8bc487f4b151db593c4455925b37cc06ef76b44861911db1",
+  "source/dr_wav.h": "03e70c1a2d9787cd7ed3e966c075bea7bac6373f759db9cd7ca9ccdfc4ec4493"
+}

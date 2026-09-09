@@ -389,6 +389,13 @@ install(DIRECTORY plugins
         DESTINATION "share/xournalpp"
         COMPONENT xournalpp
         )
+# Notizregal-Fork: Werkzeuge/Skripte/Assets der aktivierbaren Notizregal-Plugins.
+# Die Plugins finden diesen Ordner relativ als ../../notizregal (gilt fuer das
+# Quell- wie fuer das Installationslayout share/xournalpp/{plugins,notizregal}).
+install(DIRECTORY notizregal
+        DESTINATION "share/xournalpp"
+        COMPONENT xournalpp
+        )
 install(DIRECTORY resources
         DESTINATION "share/xournalpp"
         COMPONENT xournalpp

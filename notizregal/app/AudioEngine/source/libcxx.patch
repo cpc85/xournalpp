@@ -1,0 +1,4 @@
+--- a/examples/common.cpp
++++ b/examples/common.cpp
+@@ -1,0 +1,1 @@
++#include <algorithm> // Explicit include for libc++ (Notizregal ARM64 build)

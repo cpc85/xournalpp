@@ -63,3 +63,11 @@ Debug
 # Miscellaneous
 .DS_STORE
 *~
+
+# --- Notizregal-Fork: grosse Binaerassets aus der Notizregal-ZIP ------------
+# Aus Groessengruenden nicht versioniert. Fuer Sticker- und Audiofunktionen aus
+# dem Original-Paket Notizregal-Surface-v1.4.zip nach notizregal/app kopieren
+# (oder Git LFS verwenden). Ohne diese Dateien laufen die uebrigen Plugins.
+notizregal/app/OpenMoji/png/
+notizregal/app/AudioEngine/ggml-base-q5_1.bin
+notizregal/app/AudioEngine/source/whisper.cpp-v1.8.5.tar.gz
