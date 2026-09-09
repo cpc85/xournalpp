@@ -177,6 +177,9 @@ enum class Action : size_t {
     // Miscellaneous
     POSITION_HIGHLIGHTING,
 
+    // Notizregal (Fork)
+    NOTIZREGAL_SHELF,  ///< Open the Notizbuchregal (native shelf window)
+
     // Keep this last value
     ENUMERATOR_COUNT
 };

@@ -511,6 +511,9 @@ void ToolMenuHandler::initToolItems() {
     emplaceCustomItemWithTarget("VERY_THICK", Cat::TOOLS, Action::TOOL_SIZE, TOOL_SIZE_VERY_THICK, "thickness-thicker",
                                 _("Very Thick"));
 
+    // Notizregal-Fork: eigene Icon-Palette
+    emplaceCustomItem("NOTIZREGAL_SHELF", Cat::NOTIZREGAL, Action::NOTIZREGAL_SHELF, "regal", _("Notizbuchregal"));
+
     emplaceItem<SeparatorItem>("SEPARATOR");
     emplaceItem<SpacerItem>("SPACER");
 }

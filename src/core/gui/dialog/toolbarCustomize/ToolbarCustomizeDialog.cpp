@@ -72,6 +72,7 @@ ToolbarCustomizeDialog::ToolbarCustomizeDialog(GladeSearchpath* gladeSearchPath,
     labels[Cat::TOOLS] = C_("Item category in toolbar customization dialog", "Tools");
     labels[Cat::SEPARATORS] = C_("Item category in toolbar customization dialog", "Separators");
     labels[Cat::PLUGINS] = C_("Item category in toolbar customization dialog", "Plugins");
+    labels[Cat::NOTIZREGAL] = C_("Item category in toolbar customization dialog", "Notizregal");
     EnumIndexedArray<GtkWidget*, Cat> tabs;
 
     for (std::underlying_type_t<Cat> n = 0; n < xoj::to_underlying(Cat::ENUMERATOR_COUNT); n++) {

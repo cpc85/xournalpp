@@ -47,6 +47,7 @@
 #include "gui/XournalView.h"                                     // for Xour...
 #include "gui/XournalppCursor.h"                                 // for Xour...
 #include "gui/dialog/AboutDialog.h"                              // for Abou...
+#include "gui/dialog/notizregal/RegalWindow.h"                   // Notizregal-Fork
 #include "gui/dialog/FormatDialog.h"                             // for Form...
 #include "gui/dialog/GotoDialog.h"                               // for Goto...
 #include "gui/dialog/PageTemplateDialog.h"                       // for Page...
@@ -2275,6 +2276,12 @@ void Control::initButtonTool() {
 
 void Control::showAbout() {
     auto popup = xoj::popup::PopupWindowWrapper<xoj::popup::AboutDialog>(this->gladeSearchPath);
+    popup.show(GTK_WINDOW(this->win->getWindow()));
+}
+
+void Control::showNotizregalShelf() {
+    // Notizregal-Fork: natives Notizbuchregal-Fenster (kein PowerShell/WPF)
+    auto popup = xoj::popup::PopupWindowWrapper<xoj::notizregal::RegalWindow>(this);
     popup.show(GTK_WINDOW(this->win->getWindow()));
 }
 

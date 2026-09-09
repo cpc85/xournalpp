@@ -955,6 +955,11 @@ struct ActionProperties<Action::ABOUT> {
     static void callback(GSimpleAction*, GVariant*, Control* ctrl) { ctrl->showAbout(); }
 };
 
+template <>
+struct ActionProperties<Action::NOTIZREGAL_SHELF> {
+    static void callback(GSimpleAction*, GVariant*, Control* ctrl) { ctrl->showNotizregalShelf(); }
+};
+
 
 /** Generic tool config, for the toolbars **/
 template <>

@@ -867,6 +867,15 @@
    </section>
   </submenu>
   <submenu>
+   <attribute name="label" translatable="yes">_Notizregal</attribute>
+   <section id="menuNotizregal">
+    <item>
+     <attribute name="label" translatable="yes">Notizbuchregal öffnen</attribute>
+     <attribute name="action">win.notizregal-shelf</attribute>
+    </item>
+   </section>
+  </submenu>
+  <submenu>
    <attribute name="label" translatable="yes">_Help</attribute>
    <attribute name="accel">&lt;Ctrl&gt;h</attribute>
    <section id="menu3">

@@ -34,6 +34,7 @@ public:
         AUDIO,
         SEPARATORS,
         PLUGINS,
+        NOTIZREGAL,  // Notizregal-Fork: eigene Icon-Palette
         ENUMERATOR_COUNT  // Keep last
     };
     AbstractToolItem(std::string id, Category cat);

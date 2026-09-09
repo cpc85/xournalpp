@@ -153,6 +153,9 @@ public:
     void showAbout();
     void showGtkDemo();
 
+    // Notizregal (Fork): natives Notizbuchregal-Fenster oeffnen
+    void showNotizregalShelf();
+
     /**
      * @brief Update the Cursor and the Toolbar based on the active color
      *
