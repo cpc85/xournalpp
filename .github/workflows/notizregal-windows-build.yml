@@ -1,0 +1,26 @@
+name: Notizregal Windows Build (x64/ARM)
+
+# Baut die Windows-Installer (x86_64 und ARM64) des Notizregal-Forks über die
+# vorhandene reusable Workflow-Kette. Manuell auslösbar (Actions-Tab -> Run
+# workflow) und bei Push auf master. Artefakte: Installer + portable Version.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - 'po/**'
+      - '**/*.md'
+
+jobs:
+  windows:
+    name: Windows-Installer (x64 + ARM)
+    uses: ./.github/workflows/create-installers.yml
+    with:
+      windows_builds: >-
+        [
+          {"runner":"windows-2022","displayed_name":"Windows x86_64","msystem":"mingw64","msys_package_env":"x86_64","build_portable":"true"},
+          {"runner":"windows-11-arm","displayed_name":"Windows ARM","msystem":"clangarm64","msys_package_env":"clang-aarch64","build_portable":"true"}
+        ]
+      build_type: RelWithDebInfo
+      artifact_version_suffix: "+notizregal"
