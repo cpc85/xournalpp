@@ -46,10 +46,14 @@ for trans in "$build_dir"/po/*.gmo; do
     locale_no_country=$(echo $locale | sed 's/_.*//')
 
     # GTK / GLib Translation
+    # Notizregal-Fork: fehlende .mo-Dateien (auf clangarm64 bringen einige Sprachen
+    # nicht alle mit, z. B. zh) sauber ueberspringen statt Fehlermeldung.
     for f in "glib20.mo" "gdk-pixbuf.mo" "gtk30.mo" "gtk30-properties.mo"; do
-        install -Dvm644 "$prefix/share/locale/$locale/LC_MESSAGES/$f" "$setup_dir/share/locale/$locale/LC_MESSAGES/$f" \
-          || ([ "$locale" != "$locale_no_country" ] \
-              && install -Dvm644 "$prefix/share/locale/$locale_no_country/LC_MESSAGES/$f" "$setup_dir/share/locale/$locale_no_country/LC_MESSAGES/$f")
+        src="$prefix/share/locale/$locale/LC_MESSAGES/$f"
+        if [ ! -f "$src" ] && [ "$locale" != "$locale_no_country" ]; then
+            src="$prefix/share/locale/$locale_no_country/LC_MESSAGES/$f"
+        fi
+        [ -f "$src" ] && install -Dm644 "$src" "$setup_dir/share/locale/$locale/LC_MESSAGES/$f"
     done
 done
 

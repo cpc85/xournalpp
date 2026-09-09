@@ -56,6 +56,9 @@ private:
     void addFolderDialog();
     void openEntry(NotebookEntry* e);
     void toggleFavorite(NotebookEntry* e);
+    void editEntry(NotebookEntry* e);
+    void refresh();
+    void newNotebook();
 
     fs::path catalogFile() const;
     static std::uint32_t defaultColorFor(const std::string& title);
@@ -63,6 +66,8 @@ private:
     static void onSearchChanged(GtkSearchEntry* entry, gpointer self);
     static void onAddFolder(GtkButton* b, gpointer self);
     static void onFavToggle(GtkToggleButton* b, gpointer self);
+    static void onRefresh(GtkButton* b, gpointer self);
+    static void onNew(GtkButton* b, gpointer self);
     static gboolean filterFunc(GtkFlowBoxChild* child, gpointer self);
     static void onCoverDraw(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer entry);
 

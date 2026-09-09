@@ -214,9 +214,18 @@ void RegalSidebarPage::buildUi() {
 
     GtkWidget* row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
     GtkWidget* addBtn = gtk_button_new_with_label(_("Ordner …"));
+    gtk_widget_set_tooltip_text(addBtn, _("Notizordner hinzufügen"));
     g_signal_connect(addBtn, "clicked", G_CALLBACK(onAddFolder), this);
     gtk_widget_set_hexpand(addBtn, TRUE);
     gtk_box_append(GTK_BOX(row), addBtn);
+    GtkWidget* newBtn = gtk_button_new_with_label(_("＋"));
+    gtk_widget_set_tooltip_text(newBtn, _("Neues Notizbuch"));
+    g_signal_connect(newBtn, "clicked", G_CALLBACK(onNew), this);
+    gtk_box_append(GTK_BOX(row), newBtn);
+    GtkWidget* refreshBtn = gtk_button_new_with_label(_("⟳"));
+    gtk_widget_set_tooltip_text(refreshBtn, _("Aktualisieren"));
+    g_signal_connect(refreshBtn, "clicked", G_CALLBACK(onRefresh), this);
+    gtk_box_append(GTK_BOX(row), refreshBtn);
     favToggle = gtk_toggle_button_new_with_label(_("★"));
     gtk_widget_set_tooltip_text(favToggle, _("Nur Favoriten"));
     g_signal_connect(favToggle, "toggled", G_CALLBACK(onFavToggle), this);
@@ -286,7 +295,11 @@ void RegalSidebarPage::rebuildTiles() {
         gtk_widget_set_tooltip_text(titleLbl, pathToString(entry->path).c_str());
         gtk_box_append(GTK_BOX(tile), titleLbl);
 
+        GtkWidget* actions = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
+        gtk_widget_set_halign(actions, GTK_ALIGN_CENTER);
+
         GtkWidget* favBtn = gtk_button_new_with_label(entry->favorite ? "★" : "☆");
+        gtk_widget_set_tooltip_text(favBtn, _("Favorit"));
         auto* fref = new TileRef{this, entry};
         g_object_set_data_full(G_OBJECT(favBtn), "nz-ref", fref,
                                [](gpointer p) { delete static_cast<TileRef*>(p); });
@@ -296,7 +309,21 @@ void RegalSidebarPage::rebuildTiles() {
                              gtk_button_set_label(b, r->entry->favorite ? "★" : "☆");
                          }),
                          fref);
-        gtk_box_append(GTK_BOX(tile), favBtn);
+        gtk_box_append(GTK_BOX(actions), favBtn);
+
+        GtkWidget* editBtn = gtk_button_new_with_label("✎");
+        gtk_widget_set_tooltip_text(editBtn, _("Titel, Kategorie und Farbe bearbeiten"));
+        auto* eref = new TileRef{this, entry};
+        g_object_set_data_full(G_OBJECT(editBtn), "nz-ref", eref,
+                               [](gpointer p) { delete static_cast<TileRef*>(p); });
+        g_signal_connect(editBtn, "clicked", G_CALLBACK(+[](GtkButton*, gpointer d) {
+                             auto* r = static_cast<TileRef*>(d);
+                             r->self->editEntry(r->entry);
+                         }),
+                         eref);
+        gtk_box_append(GTK_BOX(actions), editBtn);
+
+        gtk_box_append(GTK_BOX(tile), actions);
 
         gtk_flow_box_insert(GTK_FLOW_BOX(flowbox), tile, -1);
     }
@@ -329,6 +356,90 @@ void RegalSidebarPage::toggleFavorite(NotebookEntry* e) {
     saveCatalog();
     gtk_flow_box_invalidate_filter(GTK_FLOW_BOX(flowbox));
 }
+
+void RegalSidebarPage::editEntry(NotebookEntry* e) {
+    if (!e) {
+        return;
+    }
+    GtkWidget* dlg = gtk_dialog_new_with_buttons(
+            _("Notizbuch bearbeiten"), control->getGtkWindow(),
+            static_cast<GtkDialogFlags>(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT), _("Abbrechen"),
+            GTK_RESPONSE_CANCEL, _("Speichern"), GTK_RESPONSE_ACCEPT, nullptr);
+
+    GtkWidget* grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 8);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 8);
+    gtk_widget_set_margin_start(grid, 12);
+    gtk_widget_set_margin_end(grid, 12);
+    gtk_widget_set_margin_top(grid, 12);
+    gtk_widget_set_margin_bottom(grid, 12);
+
+    GtkWidget* titleLbl = gtk_label_new(_("Titel"));
+    gtk_widget_set_halign(titleLbl, GTK_ALIGN_START);
+    GtkWidget* titleEntry = gtk_entry_new();
+    gtk_editable_set_text(GTK_EDITABLE(titleEntry), e->title.c_str());
+    gtk_widget_set_hexpand(titleEntry, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), titleLbl, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), titleEntry, 1, 0, 1, 1);
+
+    GtkWidget* catLbl = gtk_label_new(_("Kategorie"));
+    gtk_widget_set_halign(catLbl, GTK_ALIGN_START);
+    GtkWidget* catEntry = gtk_entry_new();
+    gtk_editable_set_text(GTK_EDITABLE(catEntry), e->category.c_str());
+    gtk_grid_attach(GTK_GRID(grid), catLbl, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), catEntry, 1, 1, 1, 1);
+
+    GtkWidget* colLbl = gtk_label_new(_("Coverfarbe"));
+    gtk_widget_set_halign(colLbl, GTK_ALIGN_START);
+    GdkRGBA rgba;
+    rgba.red = ((e->color >> 16) & 0xff) / 255.0;
+    rgba.green = ((e->color >> 8) & 0xff) / 255.0;
+    rgba.blue = (e->color & 0xff) / 255.0;
+    rgba.alpha = 1.0;
+    GtkWidget* colorBtn = gtk_color_button_new_with_rgba(&rgba);
+    gtk_widget_set_halign(colorBtn, GTK_ALIGN_START);
+    gtk_grid_attach(GTK_GRID(grid), colLbl, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), colorBtn, 1, 2, 1, 1);
+
+    GtkWidget* favChk = gtk_check_button_new_with_label(_("Favorit"));
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(favChk), e->favorite);
+    gtk_grid_attach(GTK_GRID(grid), favChk, 1, 3, 1, 1);
+
+    GtkWidget* content = gtk_dialog_get_content_area(GTK_DIALOG(dlg));
+    gtk_box_append(GTK_BOX(content), grid);
+    gtk_widget_show_all(dlg);
+
+    if (gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_ACCEPT) {
+        const char* t = gtk_editable_get_text(GTK_EDITABLE(titleEntry));
+        const char* c = gtk_editable_get_text(GTK_EDITABLE(catEntry));
+        e->title = t ? t : "";
+        e->category = c ? c : "";
+        GdkRGBA out;
+        gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(colorBtn), &out);
+        std::uint32_t r = static_cast<std::uint32_t>(out.red * 255.0 + 0.5) & 0xff;
+        std::uint32_t g = static_cast<std::uint32_t>(out.green * 255.0 + 0.5) & 0xff;
+        std::uint32_t b = static_cast<std::uint32_t>(out.blue * 255.0 + 0.5) & 0xff;
+        e->color = (r << 16) | (g << 8) | b;
+        e->favorite = gtk_check_button_get_active(GTK_CHECK_BUTTON(favChk));
+        saveCatalog();
+        rebuildTiles();
+    }
+    gtk_widget_destroy(dlg);
+}
+
+void RegalSidebarPage::refresh() {
+    scanFolders();
+    rebuildTiles();
+}
+
+void RegalSidebarPage::newNotebook() {
+    // Neues leeres Notizbuch anlegen; der Nutzer speichert es in seinen
+    // Notizordner, „Aktualisieren“ zeigt es danach an.
+    control->newFile();
+}
+
+void RegalSidebarPage::onRefresh(GtkButton*, gpointer self) { static_cast<RegalSidebarPage*>(self)->refresh(); }
+void RegalSidebarPage::onNew(GtkButton*, gpointer self) { static_cast<RegalSidebarPage*>(self)->newNotebook(); }
 
 void RegalSidebarPage::addFolderDialog() {
     GtkWidget* dialog = gtk_file_chooser_dialog_new(_("Notizordner hinzufügen"), control->getGtkWindow(),
