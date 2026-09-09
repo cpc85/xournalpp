@@ -59,6 +59,13 @@ cp -r "$prefix"/lib/gdk-pixbuf-2.0 "$setup_dir"/lib/
 echo "copy pixbuf lib dependencies"
 # most of the dependencies are not linked directly, using strings to find them
 find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -exec strings {} \; | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort | uniq | xargs -I{} cp "$prefix/bin/{}" "$setup_dir/bin/"
+# Notizregal-Fork: zusaetzlich die tatsaechlichen (rekursiven) Abhaengigkeiten
+# jedes Loaders per ldd bundlen. Die strings-Heuristik oben verfehlt auf
+# clangarm64 Abhaengigkeiten des SVG-Loaders (pixbufloader_svg.dll); dann kann
+# GTK keine (SVG-)Icons laden und stuerzt beim Start ab.
+find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -print0 | while IFS= read -r -d '' loader; do
+    ldd "$loader" | grep "${prefix}.*\.dll" -o | sort -u | xargs -I{} cp -f "{}" "$setup_dir"/bin/
+done
 
 echo "copy icons"
 cp -r "$prefix"/share/icons "$setup_dir"/share/
