@@ -14,7 +14,8 @@
 #include "gui/GladeGui.h"                            // for GladeGui
 #include "gui/sidebar/AbstractSidebarPage.h"         // for AbstractSidebar...
 #include "gui/sidebar/indextree/SidebarIndexPage.h"  // for SidebarIndexPage
-#include "gui/sidebar/notizregal/RegalSidebarPage.h"  // Notizregal-Fork
+#include "gui/sidebar/notizregal/RegalSidebarPage.h"    // Notizregal-Fork
+#include "gui/sidebar/notizregal/StickerSidebarPage.h"  // Notizregal-Fork
 #include "model/Document.h"                          // for Document
 #include "model/XojPage.h"                           // for XojPage
 #include "pdf/base/XojPdfPage.h"                     // for XojPdfPageSPtr
@@ -41,7 +42,8 @@ void Sidebar::initTabs(GtkWidget* sidebarContents) {
     addTab(std::make_unique<SidebarPreviewPages>(this->control));
     addTab(std::make_unique<SidebarPreviewLayers>(this->control, false));
     addTab(std::make_unique<SidebarPreviewLayers>(this->control, true));
-    addTab(std::make_unique<xoj::notizregal::RegalSidebarPage>(this->control));  // Notizregal-Fork
+    addTab(std::make_unique<xoj::notizregal::RegalSidebarPage>(this->control));    // Notizregal-Fork
+    addTab(std::make_unique<xoj::notizregal::StickerSidebarPage>(this->control));  // Notizregal-Fork
 
     // Init toolbar with icons
 
