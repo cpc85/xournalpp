@@ -14,6 +14,7 @@
 #include "gui/GladeGui.h"                            // for GladeGui
 #include "gui/sidebar/AbstractSidebarPage.h"         // for AbstractSidebar...
 #include "gui/sidebar/indextree/SidebarIndexPage.h"  // for SidebarIndexPage
+#include "gui/sidebar/notizregal/RegalSidebarPage.h"  // Notizregal-Fork
 #include "model/Document.h"                          // for Document
 #include "model/XojPage.h"                           // for XojPage
 #include "pdf/base/XojPdfPage.h"                     // for XojPdfPageSPtr
@@ -40,6 +41,7 @@ void Sidebar::initTabs(GtkWidget* sidebarContents) {
     addTab(std::make_unique<SidebarPreviewPages>(this->control));
     addTab(std::make_unique<SidebarPreviewLayers>(this->control, false));
     addTab(std::make_unique<SidebarPreviewLayers>(this->control, true));
+    addTab(std::make_unique<xoj::notizregal::RegalSidebarPage>(this->control));  // Notizregal-Fork
 
     // Init toolbar with icons
 
@@ -111,6 +113,18 @@ void Sidebar::setSelectedTab(size_t tab) {
                     return G_SOURCE_REMOVE;
                 },
                 this);
+    }
+}
+
+void Sidebar::setSelectedTabByName(const std::string& name) {
+    // Notizregal-Fork: Reiter anhand seines Namens auswaehlen (z. B. per Toolbar).
+    size_t i = 0;
+    for (auto&& t: this->tabs) {
+        if (t->getName() == name) {
+            setSelectedTab(i);
+            return;
+        }
+        i++;
     }
 }
 

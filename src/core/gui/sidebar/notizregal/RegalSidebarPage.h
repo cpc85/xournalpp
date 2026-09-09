@@ -1,9 +1,9 @@
 /*
  * Xournal++ – Notizregal-Fork
  *
- * Natives Notizbuchregal: ein GTK-Fenster mit Cover-Kacheln, Suche,
- * Favoriten-Filter und „Ordner hinzufügen“. Ersetzt die frühere
- * PowerShell/WPF-Variante. Metadaten liegen als GKeyFile im Konfig-Ordner.
+ * Notizbuchregal als andockbarer Sidebar-Reiter (wie Index/Seitenvorschau).
+ * Cover-Kacheln, Suche, Favoriten-Filter, „Ordner hinzufügen“. Klick öffnet das
+ * Notizbuch im Editor. Metadaten als GKeyFile im Konfig-Ordner.
  *
  * @license GNU GPLv2 or later
  */
@@ -17,7 +17,7 @@
 #include <gtk/gtk.h>
 
 #include "filesystem.h"
-#include "util/raii/GtkWindowUPtr.h"
+#include "gui/sidebar/AbstractSidebarPage.h"
 
 class Control;
 
@@ -27,20 +27,25 @@ struct NotebookEntry {
     fs::path path;
     std::string title;
     std::string category;
-    std::uint32_t color = 0x4c6557u;  // Cover-Farbe (RGB)
+    std::uint32_t color = 0x4c6557u;
     bool favorite = false;
     bool isPdf = false;
-    GtkWidget* tile = nullptr;  // Kachelinhalt (Kind des GtkFlowBoxChild)
+    GtkWidget* tile = nullptr;
 };
 
-class RegalWindow {
+class RegalSidebarPage: public AbstractSidebarPage {
 public:
-    explicit RegalWindow(Control* control);
-    ~RegalWindow();
-    RegalWindow(const RegalWindow&) = delete;
-    RegalWindow& operator=(const RegalWindow&) = delete;
+    explicit RegalSidebarPage(Control* control);
+    ~RegalSidebarPage() override;
 
-    inline GtkWindow* getWindow() const { return window.get(); }
+    // AbstractSidebarPage
+    void enableSidebar() override;
+    void disableSidebar() override;
+    void layout() override;
+    std::string getName() override;
+    std::string getIconName() override;
+    bool hasData() override;
+    GtkWidget* getWidget() override;
 
 private:
     void buildUi();
@@ -55,15 +60,13 @@ private:
     fs::path catalogFile() const;
     static std::uint32_t defaultColorFor(const std::string& title);
 
-    // GTK-Callbacks (statisch -> Instanz über user_data)
     static void onSearchChanged(GtkSearchEntry* entry, gpointer self);
     static void onAddFolder(GtkButton* b, gpointer self);
     static void onFavToggle(GtkToggleButton* b, gpointer self);
     static gboolean filterFunc(GtkFlowBoxChild* child, gpointer self);
     static void onCoverDraw(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer entry);
 
-    Control* control;
-
+    GtkWidget* root = nullptr;
     GtkWidget* flowbox = nullptr;
     GtkWidget* searchEntry = nullptr;
     GtkWidget* favToggle = nullptr;
@@ -73,9 +76,7 @@ private:
     std::vector<std::unique_ptr<NotebookEntry>> entries;
     std::string filterText;
     bool onlyFavorites = false;
-
-    // window zuletzt: wird im Destruktor zuerst zerstört (vor entries).
-    xoj::util::GtkWindowUPtr window;
+    bool scanned = false;
 };
 
 }  // namespace xoj::notizregal

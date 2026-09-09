@@ -78,6 +78,9 @@ public:
      */
     void setSelectedTab(size_t tab);
 
+    /// Notizregal-Fork: Reiter anhand seines Namens (getName) auswaehlen.
+    void setSelectedTabByName(const std::string& name);
+
 public:
     // DocumentListener interface
     void documentChanged(DocumentChangeType type) override;
