@@ -63,20 +63,24 @@ cp -r "$prefix"/lib/gdk-pixbuf-2.0 "$setup_dir"/lib/
 echo "copy pixbuf lib dependencies"
 # most of the dependencies are not linked directly, using strings to find them
 find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -exec strings {} \; | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort | uniq | xargs -I{} cp "$prefix/bin/{}" "$setup_dir/bin/"
-# Notizregal-Fork: Auf clangarm64 fehlen dem SVG-Loader (librsvg) einzelne
-# DLL-Abhaengigkeiten, die auf x64 zufaellig schon ueber xournalpp.exe kopiert
-# werden. ldd/objdump-Heuristiken sind hier unbrauchbar (ldd wuerde die kaputte
-# DLL LADEN -> blockierender Fehlerdialog -> 6h-CI-Hang; objdump fehlt auf clang).
-# Deshalb auf ARM ALLE Laufzeit-DLLs des Prefix mitnehmen. Reines Kopieren ->
-# kann nicht haengen; x64 bleibt schlank (bewaehrte Heuristik oben).
-if [ "${MSYSTEM}" = "CLANGARM64" ]; then
-    echo "copy all prefix DLLs (clangarm64 svg-loader dependency fix)"
-    for dll in "$prefix"/bin/*.dll; do
-        [ -f "$dll" ] || continue
-        base=$(basename "$dll")
-        [ -f "$setup_dir/bin/$base" ] || cp -f "$dll" "$setup_dir/bin/"
+# Notizregal-Fork: die obige strings-Heuristik erfasst nur die DIREKTEN
+# Abhaengigkeiten der Loader. Auf clangarm64 fehlt dem SVG-Loader eine tiefer
+# liegende Abhaengigkeit (librsvg-Kette), die auf x64 zufaellig schon via
+# xournalpp.exe kopiert wird. Daher dieselbe Heuristik REKURSIV anwenden.
+# Nutzt 'strings' (fuehrt nichts aus -> kein Hang) und folgt nur echten
+# lib*.dll-Abhaengigkeiten im Prefix; Toolchain-DLLs (LLVM) werden nicht gezogen.
+nz_scan_deps() {
+    strings "$1" 2>/dev/null | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort -u | while read -r dep; do
+        src="$prefix/bin/$dep"
+        if [ -f "$src" ] && [ ! -f "$setup_dir/bin/$dep" ]; then
+            cp -f "$src" "$setup_dir/bin/"
+            nz_scan_deps "$src"
+        fi
     done
-fi
+}
+find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" | while read -r loader; do
+    nz_scan_deps "$loader"
+done
 
 echo "copy icons"
 cp -r "$prefix"/share/icons "$setup_dir"/share/
