@@ -48,6 +48,8 @@
 #include "gui/XournalppCursor.h"                                 // for Xour...
 #include "gui/dialog/AboutDialog.h"                              // for Abou...
 #include "gui/sidebar/Sidebar.h"                                 // Notizregal-Fork
+#include "control/notizregal/NotebookVersioning.h"               // Notizregal-Fork
+#include "gui/dialog/notizregal/VersionsDialog.h"                // Notizregal-Fork
 #include "gui/dialog/FormatDialog.h"                             // for Form...
 #include "gui/dialog/GotoDialog.h"                               // for Goto...
 #include "gui/dialog/PageTemplateDialog.h"                       // for Page...
@@ -2168,6 +2170,11 @@ void Control::resetSavedStatus() {
     this->undoRedo->documentSaved();
     RecentManager::addRecentFileFilename(filepath);
     this->updateWindowTitle();
+
+    // Notizregal-Fork: automatische Versionssicherung nach erfolgreichem Speichern.
+    if (!filepath.empty()) {
+        xoj::notizregal::NotebookVersioning::saveVersion(filepath, "Automatisch");
+    }
 }
 
 void Control::quit(bool allowCancel) {
@@ -2285,6 +2292,19 @@ void Control::showNotizregalShelf() {
     if (Sidebar* sb = this->getSidebar()) {
         sb->setSelectedTabByName(_("Regal"));
     }
+}
+
+void Control::showNotizregalVersions() {
+    // Notizregal-Fork: Versionsdialog fuer das aktuelle Notizbuch.
+    this->doc->lock_shared();
+    fs::path book = this->doc->getFilepath();
+    this->doc->unlock_shared();
+    if (book.empty()) {
+        XojMsgBox::showErrorToUser(getGtkWindow(),
+                                   _("Bitte das Notizbuch zuerst speichern, um Versionen zu verwalten."));
+        return;
+    }
+    xoj::notizregal::showVersionsDialog(this, book);
 }
 
 static void onGtkDemoShown(GObject* proc_object, GAsyncResult* res, gpointer) {

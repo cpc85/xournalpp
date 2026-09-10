@@ -873,6 +873,10 @@
      <attribute name="label" translatable="yes">Notizbuchregal öffnen</attribute>
      <attribute name="action">win.notizregal-shelf</attribute>
     </item>
+    <item>
+     <attribute name="label" translatable="yes">Versionen …</attribute>
+     <attribute name="action">win.notizregal-versions</attribute>
+    </item>
    </section>
   </submenu>
   <submenu>

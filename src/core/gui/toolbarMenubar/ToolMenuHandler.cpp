@@ -513,6 +513,8 @@ void ToolMenuHandler::initToolItems() {
 
     // Notizregal-Fork: eigene Icon-Palette
     emplaceCustomItem("NOTIZREGAL_SHELF", Cat::NOTIZREGAL, Action::NOTIZREGAL_SHELF, "regal", _("Notizbuchregal"));
+    emplaceCustomItem("NOTIZREGAL_VERSIONS", Cat::NOTIZREGAL, Action::NOTIZREGAL_VERSIONS, "versions",
+                      _("Versionen"));
 
     emplaceItem<SeparatorItem>("SEPARATOR");
     emplaceItem<SpacerItem>("SPACER");
