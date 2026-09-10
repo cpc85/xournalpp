@@ -63,27 +63,18 @@ cp -r "$prefix"/lib/gdk-pixbuf-2.0 "$setup_dir"/lib/
 echo "copy pixbuf lib dependencies"
 # most of the dependencies are not linked directly, using strings to find them
 find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -exec strings {} \; | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort | uniq | xargs -I{} cp "$prefix/bin/{}" "$setup_dir/bin/"
-# Notizregal-Fork: Loader-Abhaengigkeiten STATISCH und rekursiv ergaenzen.
-# WICHTIG: hier KEIN ldd verwenden! ldd laedt die DLL zum Aufloesen; fehlt eine
-# Abhaengigkeit (z. B. beim SVG-Loader auf clangarm64), oeffnet Windows einen
-# blockierenden Fehlerdialog -> der headless-CI-Job haengt bis zum 6h-Timeout.
-# objdump liest nur die PE-Import-Tabelle (fuehrt nichts aus) und kann daher
-# nicht haengen. So werden auch tief verschachtelte Abhaengigkeiten des
-# SVG-Loaders (librsvg-Kette) mitgenommen, die auf x64 zufaellig schon via
-# xournalpp.exe kopiert werden, auf ARM aber fehlen.
-if command -v objdump >/dev/null 2>&1; then
-    nz_copy_deps() {
-        objdump -p "$1" 2>/dev/null | grep -i 'DLL Name:' | sed 's/.*DLL Name:[[:space:]]*//' | tr -d '\r' \
-        | while read -r dep; do
-            src="$prefix/bin/$dep"
-            if [ -f "$src" ] && [ ! -f "$setup_dir/bin/$dep" ]; then
-                cp -f "$src" "$setup_dir/bin/"
-                nz_copy_deps "$src"
-            fi
-        done
-    }
-    find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" | while read -r loader; do
-        nz_copy_deps "$loader"
+# Notizregal-Fork: Auf clangarm64 fehlen dem SVG-Loader (librsvg) einzelne
+# DLL-Abhaengigkeiten, die auf x64 zufaellig schon ueber xournalpp.exe kopiert
+# werden. ldd/objdump-Heuristiken sind hier unbrauchbar (ldd wuerde die kaputte
+# DLL LADEN -> blockierender Fehlerdialog -> 6h-CI-Hang; objdump fehlt auf clang).
+# Deshalb auf ARM ALLE Laufzeit-DLLs des Prefix mitnehmen. Reines Kopieren ->
+# kann nicht haengen; x64 bleibt schlank (bewaehrte Heuristik oben).
+if [ "${MSYSTEM}" = "CLANGARM64" ]; then
+    echo "copy all prefix DLLs (clangarm64 svg-loader dependency fix)"
+    for dll in "$prefix"/bin/*.dll; do
+        [ -f "$dll" ] || continue
+        base=$(basename "$dll")
+        [ -f "$setup_dir/bin/$base" ] || cp -f "$dll" "$setup_dir/bin/"
     done
 fi
 
