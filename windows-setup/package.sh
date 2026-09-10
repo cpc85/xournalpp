@@ -63,13 +63,18 @@ cp -r "$prefix"/lib/gdk-pixbuf-2.0 "$setup_dir"/lib/
 echo "copy pixbuf lib dependencies"
 # most of the dependencies are not linked directly, using strings to find them
 find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -exec strings {} \; | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort | uniq | xargs -I{} cp "$prefix/bin/{}" "$setup_dir/bin/"
-# Notizregal-Fork: zusaetzlich die tatsaechlichen (rekursiven) Abhaengigkeiten
-# jedes Loaders per ldd bundlen. Die strings-Heuristik oben verfehlt auf
-# clangarm64 Abhaengigkeiten des SVG-Loaders (pixbufloader_svg.dll); dann kann
-# GTK keine (SVG-)Icons laden und stuerzt beim Start ab.
-find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -print0 | while IFS= read -r -d '' loader; do
-    ldd "$loader" | grep "${prefix}.*\.dll" -o | sort -u | xargs -I{} cp -f "{}" "$setup_dir"/bin/
-done
+# Notizregal-Fork: Loader-Abhaengigkeiten zusaetzlich STATISCH ergaenzen.
+# WICHTIG: hier KEIN ldd verwenden! ldd laedt die DLL zum Aufloesen; fehlt eine
+# Abhaengigkeit (z. B. beim SVG-Loader auf clangarm64), oeffnet Windows einen
+# blockierenden Fehlerdialog -> der headless-CI-Job haengt bis zum 6h-Timeout.
+# ntldd liest nur die Import-Tabelle (PE) und kann daher nicht haengen.
+if command -v ntldd >/dev/null 2>&1; then
+    find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -print0 | while IFS= read -r -d '' loader; do
+        ntldd -R "$loader" 2>/dev/null | grep -oiE "${prefix}[^ ]*\.dll" | sort -u | while read -r dep; do
+            [ -f "$dep" ] && cp -f "$dep" "$setup_dir"/bin/
+        done
+    done
+fi
 
 echo "copy icons"
 cp -r "$prefix"/share/icons "$setup_dir"/share/
