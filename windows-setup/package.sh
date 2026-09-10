@@ -63,16 +63,27 @@ cp -r "$prefix"/lib/gdk-pixbuf-2.0 "$setup_dir"/lib/
 echo "copy pixbuf lib dependencies"
 # most of the dependencies are not linked directly, using strings to find them
 find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -exec strings {} \; | grep "^lib.*\.dll$" | grep -v "libpixbufloader" | sort | uniq | xargs -I{} cp "$prefix/bin/{}" "$setup_dir/bin/"
-# Notizregal-Fork: Loader-Abhaengigkeiten zusaetzlich STATISCH ergaenzen.
+# Notizregal-Fork: Loader-Abhaengigkeiten STATISCH und rekursiv ergaenzen.
 # WICHTIG: hier KEIN ldd verwenden! ldd laedt die DLL zum Aufloesen; fehlt eine
 # Abhaengigkeit (z. B. beim SVG-Loader auf clangarm64), oeffnet Windows einen
 # blockierenden Fehlerdialog -> der headless-CI-Job haengt bis zum 6h-Timeout.
-# ntldd liest nur die Import-Tabelle (PE) und kann daher nicht haengen.
-if command -v ntldd >/dev/null 2>&1; then
-    find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" -print0 | while IFS= read -r -d '' loader; do
-        ntldd -R "$loader" 2>/dev/null | grep -oiE "${prefix}[^ ]*\.dll" | sort -u | while read -r dep; do
-            [ -f "$dep" ] && cp -f "$dep" "$setup_dir"/bin/
+# objdump liest nur die PE-Import-Tabelle (fuehrt nichts aus) und kann daher
+# nicht haengen. So werden auch tief verschachtelte Abhaengigkeiten des
+# SVG-Loaders (librsvg-Kette) mitgenommen, die auf x64 zufaellig schon via
+# xournalpp.exe kopiert werden, auf ARM aber fehlen.
+if command -v objdump >/dev/null 2>&1; then
+    nz_copy_deps() {
+        objdump -p "$1" 2>/dev/null | grep -i 'DLL Name:' | sed 's/.*DLL Name:[[:space:]]*//' | tr -d '\r' \
+        | while read -r dep; do
+            src="$prefix/bin/$dep"
+            if [ -f "$src" ] && [ ! -f "$setup_dir/bin/$dep" ]; then
+                cp -f "$src" "$setup_dir/bin/"
+                nz_copy_deps "$src"
+            fi
         done
+    }
+    find "$prefix/lib/gdk-pixbuf-2.0" -type f -name "*.dll" | while read -r loader; do
+        nz_copy_deps "$loader"
     done
 fi
 
